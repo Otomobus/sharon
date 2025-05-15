@@ -1,0 +1,1 @@
+/*iccha prank wala talagang script_2 tinamad na ako ayusin same kasi script ng about us at index */

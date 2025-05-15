@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sharon Farm Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f3f3;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: #2f7a32;
+      color: white;
+      padding: 10px 20px;
+      font-size: 24px;
+    }
+    .container {
+      background: white;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+    }
+    .container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2f7a32;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="text"], textarea, select, input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    input[type="file"] {
+      margin-top: 10px;
+    }
+    .preview {
+      max-width: 200px;
+      margin: 10px 0;
+      display: block;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #2f7a32;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #256429;
+    }
+    #items {
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    #items div {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    img.item-img {
+      width: 100px;
+      display: block;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">Sharon Farm Admin Panel</div>
+
+<div class="container">
+  <h2>Upload Product</h2>
+  <form id="uploadForm">
+    <label>Type</label>
+    <select name="type">
+      <option value="product">Product</option>
+    </select>
+
+    <label>Title</label>
+    <input type="text" name="title" required>
+
+    <label>Description</label>
+    <textarea name="description" rows="4" required></textarea>
+
+    <label>Price (products only)</label>
+    <input type="text" name="price" placeholder="Price (products only)">
+
+    <label>Category</label>
+    <select name="category" required>
+      <option value="Agriculture Products">Agriculture Products</option>
+      <option value="Livestock">Livestock</option>
+      <option value="Other Products">Other Products</option>
+    </select>
+
+    <label>Upload Image</label>
+    <input type="file" name="image" required>
+    <img id="preview" class="preview" src="#" alt="Image Preview">
+
+    <button type="submit">Upload</button>
+  </form>
+</div>
+
+<div class="container">
+  <h2>Upload Project</h2>
+  <form id="uploadProjectForm">
+    <label>Title</label>
+    <input type="text" name="title" required>
+
+    <label>Description</label>
+    <textarea name="description" rows="4" required></textarea>
+
+    <label>Upload Image</label>
+    <input type="file" name="image" required>
+    <img id="previewProject" class="preview" src="#" alt="Image Preview">
+
+    <button type="submit">Upload Project</button>
+  </form>
+</div>
+
+<div class="container">
+  <h2>Contact Us Email</h2>
+  <form id="uploadContactForm">
+    <label>Email</label>
+    <input type="email" name="email" required>
+    <button type="submit">Update Email</button>
+  </form>
+</div>
+
+<div class="container">
+  <h2>Upload Award</h2>
+  <form id="uploadAwardForm">
+    <label>Title</label>
+    <input type="text" name="title" required>
+    <label>Upload Image</label>
+    <input type="file" name="image" required>
+    <img id="previewAward" class="preview" src="#" alt="Award Preview">
+    <button type="submit">Upload Award</button>
+  </form>
+</div>
+
+<div id="items" class="container">
+  <h2>Uploaded Items</h2>
+</div>
+
+<script>
+const form = document.getElementById('uploadForm');
+const preview = document.getElementById('preview');
+const projectForm = document.getElementById('uploadProjectForm');
+const previewProject = document.getElementById('previewProject');
+const contactForm = document.getElementById('uploadContactForm');
+const awardForm = document.getElementById('uploadAwardForm');
+const previewAward = document.getElementById('previewAward');
+const itemsDiv = document.getElementById('items');
+
+form.image.onchange = e => preview.src = URL.createObjectURL(e.target.files[0]);
+projectForm.image.onchange = e => previewProject.src = URL.createObjectURL(e.target.files[0]);
+awardForm.image.onchange = e => previewAward.src = URL.createObjectURL(e.target.files[0]);
+
+form.onsubmit = async e => {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const res = await fetch('http://localhost:3000/upload', {
+    method: 'POST',
+    body: formData
+  });
+  alert((await res.json()).message);
+  loadItems();
+};
+
+projectForm.onsubmit = async e => {
+  e.preventDefault();
+  const formData = new FormData(projectForm);
+  formData.append("type", "project");
+  const res = await fetch('http://localhost:3000/upload', {
+    method: 'POST',
+    body: formData
+  });
+  alert((await res.json()).message);
+  loadItems();
+};
+
+contactForm.onsubmit = async e => {
+  e.preventDefault();
+  const formData = new FormData(contactForm);
+  formData.append("type", "contact");
+  const res = await fetch('http://localhost:3000/upload', {
+    method: 'POST',
+    body: formData
+  });
+  alert((await res.json()).message);
+  contactForm.reset();
+  loadItems();
+};
+
+awardForm.onsubmit = async e => {
+  e.preventDefault();
+  const formData = new FormData(awardForm);
+  formData.append("type", "award");
+  const res = await fetch('http://localhost:3000/upload', {
+    method: 'POST',
+    body: formData
+  });
+  alert((await res.json()).message);
+  awardForm.reset();
+  previewAward.src = "#";
+  loadItems();
+};
+
+async function loadItems() {
+  itemsDiv.innerHTML = '<h2>Uploaded Items</h2>';
+  for (const type of ['product', 'project']) {
+    const res = await fetch(`http://localhost:3000/data/${type}`);
+    const items = await res.json();
+    const section = document.createElement('div');
+    section.innerHTML = `<h3>${type.toUpperCase()}S</h3>`;
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <strong>${item.title}</strong> (${item.category || ''})<br>
+        <img src="${item.image}" class="item-img"><br>
+        <button onclick="deleteItem('${type}', '${item.title}')">Delete</button>
+      `;
+      section.appendChild(div);
+    });
+    itemsDiv.appendChild(section);
+  }
+
+  const contactRes = await fetch("http://localhost:3000/data/contact");
+  const contactData = await contactRes.json();
+  const contactSection = document.createElement('div');
+  contactSection.innerHTML = `<h3>CONTACT</h3><p>Email: ${contactData.email}</p>`;
+  itemsDiv.appendChild(contactSection);
+
+  const awardRes = await fetch("http://localhost:3000/data/award");
+  const awards = await awardRes.json();
+  const awardSection = document.createElement('div');
+  awardSection.innerHTML = '<h3>AWARDS</h3>';
+  awards.forEach(award => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <strong>${award.title}</strong><br>
+      <img src="${award.image}" class="item-img"><br>
+      <button onclick="deleteItem('award', '${award.title}')">Delete</button>
+    `;
+    awardSection.appendChild(div);
+  });
+  itemsDiv.appendChild(awardSection);
+}
+
+async function deleteItem(type, title) {
+  const res = await fetch(`http://localhost:3000/delete/${type}/${title}`, {
+    method: 'DELETE'
+  });
+  alert((await res.json()).message);
+  loadItems();
+}
+
+loadItems();
+</script>
+</body>
+</html>
